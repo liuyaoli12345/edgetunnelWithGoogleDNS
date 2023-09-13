@@ -4,7 +4,7 @@ import { connect } from 'cloudflare:sockets';
 
 // How to generate your own UUID:
 // [Windows] Press "Win + R", input cmd and run:  Powershell -NoExit -Command "[guid]::NewGuid()"
-let userID = 'd342d11e-d424-4583-b36e-524ab1f0afa4';
+let userID = '';
 
 let proxyIP = '';
 
@@ -554,14 +554,15 @@ async function handleUDPOutBound(webSocket, vlessResponseHeader, log) {
 	// only handle dns udp for now
 	transformStream.readable.pipeTo(new WritableStream({
 		async write(chunk) {
-			const resp = await fetch('https://1.1.1.1/dns-query',
-				{
-					method: 'POST',
-					headers: {
-						'content-type': 'application/dns-message',
-					},
-					body: chunk,
-				})
+			const resp = await fetch('https://dns.google/dns-query',
+			{
+				method: 'POST',
+				headers: {
+					'content-type': 'application/dns-message',
+				},
+				body: chunk,
+			});
+
 			const dnsQueryResult = await resp.arrayBuffer();
 			const udpSize = dnsQueryResult.byteLength;
 			// console.log([...new Uint8Array(dnsQueryResult)].map((x) => x.toString(16)));
@@ -628,4 +629,3 @@ clash-meta
 ################################################################
 `;
 }
-
